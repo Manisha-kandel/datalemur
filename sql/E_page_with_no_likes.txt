@@ -1,0 +1,4 @@
+-- Basically need to select those ids which are there in pages table, but not in  page_id column of table page_likes 
+SELECT page_id FROM pages 
+WHERE page_id NOT IN (SELECT page_id FROM page_likes)
+;

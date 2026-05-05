@@ -1,0 +1,7 @@
+--Laptop vs Mobile viewership
+-- we need to do conditional aggregation here, use case when for the same  SUM(CASE WHEN condition THEN v1 ELSE v2 END)
+SELECT 
+  SUM(CASE WHEN device_type = 'laptop' THEN 1 ELSE 0 END) as laptop_views,
+  SUM(CASE WHEN device_type IN ('tablet', 'phone') THEN 1 ELSE 0 END) as mobile_views
+FROM viewership
+;

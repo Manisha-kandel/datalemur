@@ -1,0 +1,8 @@
+--Average Post Hiatus(part 1)
+--filter posts from 2021, if there are >1 posts, SELECT days_between
+SELECT user_id, (MAX(CAST(post_date AS DATE)) - MIN(CAST(post_date AS DATE))) as days_between  
+FROM posts
+WHERE EXTRACT(YEAR FROM post_date) = 2021  --filter 2021's post
+GROUP BY user_id               
+HAVING COUNT(*) > 1     -- filter those with more than 1 posts (in 2021)
+;
