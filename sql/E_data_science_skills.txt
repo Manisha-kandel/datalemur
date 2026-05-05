@@ -1,0 +1,18 @@
+-- since there are no duplicates in the table, all we need to do is first filter out the rows where skills in (python, tableau, postgreSQL), 
+-- then count the nubmer of rows by aggregating them, then if that's 3, those are the ones 
+-- with all the skilla required. 
+with cte as (
+SELECT candidate_id, skill FROM candidates
+WHERE skill IN ('Python', 'Tableau', 'PostgreSQL')
+),
+
+cte2 as (
+SELECT candidate_id, COUNT(*) as skill_count
+FROM cte 
+GROUP BY candidate_id
+ORDER BY candidate_id
+)
+
+SELECT candidate_id from cte2 
+WHERE skill_count = 3
+ORDER BY candidate_id;
