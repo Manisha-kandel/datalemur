@@ -1,0 +1,14 @@
+-- well_paid_employees, 10 minutes
+--join with itself, to list out manager salary and employee salary for non-manager exmployess (i.e. manager_id != NULL), 
+-- then list those out who have salary > manager_salary
+WITH cte AS (
+SELECT e1.employee_id, e1.name AS employee_name, e1.salary, e2.salary AS manager_salary
+FROM employee e1
+INNER JOIN employee e2
+ON e1.manager_id = e2.employee_id
+WHERE e1.manager_id IS NOT NULL)
+
+SELECT employee_id, employee_name
+FROM cte 
+WHERE salary > manager_salary
+;

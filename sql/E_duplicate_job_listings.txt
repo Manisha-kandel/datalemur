@@ -1,0 +1,9 @@
+-- Duplicate Job Listings - 5 minutes
+-- count companies with duplicate job listings
+
+SELECT COUNT(*) 
+FROM (SELECT company_id 
+      FROM job_listings
+      GROUP BY company_id, title, description
+      HAVING COUNT(*) > 1) AS cte
+;

@@ -1,0 +1,18 @@
+-- cities_with_completed_trades - 10 minutes
+-- top 3 cities with highest # of completed trade orders
+with cte AS (SELECT t.user_id, t.status, u.city
+FROM trades t
+LEFT JOIN users u 
+ON t.user_id = u.user_id), 
+
+cte2 AS (SELECT
+    city, 
+    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as total_orders
+FROM cte 
+GROUP BY city)
+
+SELECT * 
+FROM cte2
+ORDER BY total_orders DESC
+LIMIT 3
+;

@@ -1,0 +1,9 @@
+-- second_day_confirmation, 10 minutes
+-- need to use LAG fcn by ordering 
+SELECT e.user_id
+FROM emails e 
+LEFT JOIN texts t
+  ON e.email_id = t.email_id
+WHERE t.signup_action = 'Confirmed' 
+  AND (CAST(action_date AS DATE) - CAST(signup_date AS DATE) = 1)
+;
