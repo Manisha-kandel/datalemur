@@ -1,0 +1,14 @@
+-- final_account_balance, 5 minutes
+-- simple conditional aggregations to final total deposit and withdrawals, then later deposit-withdrawal as the answer, 
+-- note: it can be directly done as SUM(..) - SUM(..) as well, depends on how much complex code or legible code we are willing to write. 
+
+WITH cte AS (
+SELECT account_id, 
+  SUM(CASE WHEN transaction_type = 'Deposit' THEN amount ELSE 0 END) AS deposit_sum,
+  SUM(CASE WHEN transaction_type = 'Withdrawal' THEN amount ELSE 0 END) AS withdrawal_sum
+FROM transactions
+GROUP BY account_id)
+
+SELECT account_id, deposit_sum - withdrawal_sum AS final_balance
+FROM cte
+;
