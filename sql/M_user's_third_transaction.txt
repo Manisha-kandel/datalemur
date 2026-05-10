@@ -1,0 +1,14 @@
+-- M_user's_third_transaction, 20 minutes
+WITH cte AS (
+  SELECT *,
+  RANK() OVER (
+  PARTITION BY user_id 
+  ORDER BY transaction_date
+  ) AS rank_
+FROM transactions
+)
+
+SELECT user_id, spend, transaction_date 
+FROM cte 
+WHERE rank_ = 3
+;

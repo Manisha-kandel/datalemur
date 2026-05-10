@@ -1,0 +1,14 @@
+-- E_patient_support_analysis_part1, 5 minutes
+WITH cte AS (
+SELECT 
+  policy_holder_id, 
+  COUNT(case_id) AS cnt
+FROM callers
+GROUP BY policy_holder_id
+)
+
+SELECT 
+  COUNT(cnt) AS policy_holder_count
+FROM cte 
+WHERE cnt > 2
+;

@@ -1,0 +1,19 @@
+-- M_swapped_food_delivery, 15 minutes
+-- for every pair of two, swap the items and order_id
+
+WITH order_counts AS (
+SELECT COUNT(order_id) AS total_orders
+FROM orders
+)
+
+SELECT
+  CASE
+    WHEN order_id % 2 != 0 AND order_id != total_orders THEN order_id + 1 --odd to even (1 to 2, 3 to 4 and so on)  
+    WHEN order_id %2 != 0 AND order_id = total_orders THEN order_id -- last row if odd #rows
+    ELSE order_id - 1 --even to odd
+  END AS corrected_order_id,
+  item
+FROM orders
+CROSS JOIN order_counts
+ORDER BY corrected_order_id
+;

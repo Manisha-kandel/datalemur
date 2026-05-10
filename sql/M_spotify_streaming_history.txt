@@ -1,0 +1,30 @@
+-- M_spotify_streaming_history, 10 minutes
+-- history is there
+-- weekly(from aug 01- aug07 2022) is there
+-- till 4th august, what was the song_plays summary for each user, each song
+
+WITH combined_table AS (
+
+SELECT user_id, song_id, song_plays
+FROM songs_history
+
+UNION ALL                  --note this
+
+SELECT 
+  user_id, song_id, COUNT(song_id) AS song_plays
+FROM songs_weekly
+WHERE listen_time < '08-05-2022'
+GROUP BY 
+  user_id, 
+  song_id
+  
+)
+
+SELECT 
+  user_id, 
+  song_id,
+  SUM(song_plays) AS song_plays
+FROM combined_table
+GROUP BY user_id, song_id
+ORDER BY song_plays DESC
+;

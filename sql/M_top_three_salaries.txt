@@ -1,0 +1,29 @@
+-- M_top_three_salaries, 10 minutes
+
+-- department: top 3 earningS, could be for more than 3 people, use dense_rank
+-- identify those for all departments
+-- use DENSE_RANK() 
+-- ORDER BY salary DESC, name ASC  
+WITH cte AS (
+SELECT *,
+  DENSE_RANK() OVER(
+    PARTITION BY e.department_id
+    ORDER BY salary DESC
+  ) AS d_rank
+FROM employee e 
+LEFT JOIN department d
+  ON e.department_id = d.department_id
+)
+
+SELECT 
+  department_name, 
+  name, 
+  salary 
+FROM cte
+WHERE d_rank < 4
+ORDER BY 
+  department_name,
+  salary DESC,
+  name ASC
+
+;

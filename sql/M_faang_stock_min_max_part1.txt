@@ -1,0 +1,28 @@
+-- M_faang_stock_min_max_part1, 20 minutes
+WITH highest_prices AS (
+  SELECT 
+    ticker, 
+    TO_CHAR(date, 'Mon-YYYY') AS highest_mth,
+    open AS highest_open,
+    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY open DESC) AS rn
+  FROM stock_prices
+),
+lowest_prices AS (
+  SELECT 
+    ticker, 
+    TO_CHAR(date, 'Mon-YYYY') AS lowest_mth,
+    open AS lowest_open,
+    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY open ASC) AS rn
+  FROM stock_prices
+)
+
+SELECT 
+  h.ticker, h.highest_mth, h.highest_open, l.lowest_mth, l.lowest_open
+FROM highest_prices h
+JOIN lowest_prices l ON h.ticker = l.ticker
+WHERE h.rn = 1 AND l.rn = 1
+ORDER BY h.ticker
+
+;
+
+-- SELECT * FROM stock_prices;

@@ -1,0 +1,29 @@
+-- M_highest_grossing_items, 20 minutes
+WITH cte AS (
+  SELECT 
+    category, 
+    product, 
+    SUM(spend) AS total_spend
+  FROM product_spend 
+  WHERE EXTRACT(YEAR FROM transaction_date) = 2022
+  GROUP BY category, product
+)
+, 
+
+cte2 AS (
+SELECT *, 
+  ROW_NUMBER() OVER(
+      PARTITION BY category 
+      ORDER BY total_spend DESC
+    ) AS row_num
+FROM cte
+)
+
+SELECT category, product, total_spend
+FROM cte2
+WHERE row_num < 3
+ORDER BY 
+  category ASC, 
+  total_spend DESC
+  
+;

@@ -1,0 +1,20 @@
+-- M_supercloud_customer, 15 minutes
+WITH cte AS (
+SELECT 
+  c.customer_id, 
+  p.product_category, 
+  COUNT(*) AS cnt
+FROM customer_contracts c  
+LEFT JOIN products p 
+  ON c.product_id  = p.product_id
+GROUP BY c.customer_id, p.product_category
+ORDER BY customer_id
+)
+
+SELECT customer_id
+FROM cte 
+GROUP BY customer_id
+HAVING COUNT(product_category) = (SELECT COUNT(DISTINCT(product_category)) FROM products)     -- need to find this dynamically, tried with 3, that worked but that would have been wrong
+;
+
+-- SELECT * FROM  products;

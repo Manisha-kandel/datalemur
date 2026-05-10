@@ -1,0 +1,15 @@
+-- M_second_highest_salary, 10 minutes
+-- use dense_rank
+WITH cte AS (
+SELECT *,
+  DENSE_RANK() OVER (
+  ORDER BY salary DESC             --no need to use PARTITION BY
+  ) AS d_rank
+
+FROM employee
+)
+
+SELECT salary AS second_highest_salary
+FROM cte 
+WHERE d_rank = 2
+;

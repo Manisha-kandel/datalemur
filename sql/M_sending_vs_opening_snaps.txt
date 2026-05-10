@@ -1,0 +1,26 @@
+-- M_sending_vs_opening_snaps, 10 minutes
+WITH cte AS (
+SELECT 
+  ac.*, ab.age_bucket
+FROM activities ac
+LEFT JOIN age_breakdown ab
+  ON ac.user_id = ab.user_id
+)
+,
+
+cte2 AS (
+SELECT 
+    age_bucket, 
+    SUM(CASE WHEN activity_type = 'open' THEN time_spent ELSE 0 END) AS open_time,
+    SUM(CASE WHEN activity_type = 'send' THEN time_spent ELSE 0 END) AS send_time,
+    SUM(CASE WHEN activity_type IN ('send', 'open') THEN time_spent ELSE 0 END) AS total_time
+FROM cte 
+GROUP BY age_bucket
+)
+
+SELECT 
+  age_bucket, 
+  ROUND(send_time*100.0/total_time, 2) AS send_perc, 
+  ROUND(open_time*100.0/total_time, 2) AS open_perc
+FROM cte2
+;

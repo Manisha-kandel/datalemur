@@ -1,0 +1,19 @@
+-- M_signup_activation_rate, 15 minutes
+-- show users_confirmed / total_users
+-- (for each user, one confirmed line is there
+WITH cte AS (
+SELECT * 
+FROM emails e 
+LEFT JOIN texts t 
+  ON e.email_id = t.email_id 
+  AND t.signup_action = 'Confirmed'
+)  
+
+SELECT 
+  ROUND(
+  SUM(CASE WHEN signup_action = 'Confirmed' THEN 1 ELSE 0 END)::DECIMAL 
+  / COUNT(user_id)
+  , 2) 
+  AS confirm_rate
+FROM cte
+;
