@@ -1,0 +1,10 @@
+-- M_user_shopping_sprees, 10 minutes, took hint
+SELECT T1.user_id 
+FROM transactions T1
+INNER JOIN transactions T2 
+  ON DATE(T2.transaction_date) = DATE(T1.transaction_date) + 1
+INNER JOIN transactions T3
+  ON DATE(T3.transaction_date) = DATE(T2.transaction_date) + 1
+WHERE T1.user_id = T2.user_id AND T2.user_id = T3.user_id
+ORDER BY user_id
+;

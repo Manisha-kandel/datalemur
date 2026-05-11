@@ -1,0 +1,18 @@
+-- M_card_launch_success, 10 minutes
+WITH cte AS (
+SELECT card_name, issued_amount,
+ROW_NUMBER() OVER (
+  PARTITION BY card_name
+  ORDER BY 
+    issue_year ASC, 
+    issue_month ASC
+  ) AS row_num
+FROM monthly_cards_issued
+)
+
+SELECT card_name, issued_amount
+FROM cte 
+WHERE row_num = 1
+ORDER BY issued_amount DESC
+
+;

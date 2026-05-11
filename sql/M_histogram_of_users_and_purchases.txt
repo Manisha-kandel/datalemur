@@ -1,0 +1,18 @@
+-- M_histogram_of_users_and_purchases, 8 minutes
+WITH cte AS (
+SELECT * ,
+  DENSE_RANK() OVER (
+  PARTITION BY user_id
+  ORDER BY transaction_date DESC
+  ) AS last_date
+FROM user_transactions
+)
+
+SELECT 
+  transaction_date, 
+  user_id, 
+  COUNT(*) AS purchase_count
+FROM cte 
+WHERE last_date = 1
+GROUP BY transaction_date, user_id
+;

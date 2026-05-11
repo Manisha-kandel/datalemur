@@ -1,0 +1,27 @@
+-- H_yoy_growth_rate, 10 minutes
+WITH cte AS (
+
+SELECT 
+  product_id, 
+  EXTRACT(YEAR FROM transaction_date) AS year, 
+  SUM(spend) AS curr_year_spend
+FROM user_transactions
+GROUP BY product_id, EXTRACT(YEAR FROM transaction_date)
+
+), cte2 AS (
+
+SELECT 
+  year, 
+  product_id, 
+  curr_year_spend,
+  LAG(curr_year_spend,1) OVER(              --default is also 1 for lag
+    PARTITION BY product_id
+    ORDER BY year) AS prev_year_spend
+FROM cte
+)
+
+SELECT *, 
+  ROUND(
+  (curr_year_spend*1.0/prev_year_spend - 1)*100.0, 2) AS yoy_rate
+FROM cte2 
+;

@@ -1,0 +1,27 @@
+-- H_advertiser_status, 20 mins
+-- use of COALESCE while doing full join is the key to include any new ids in daily_pay table as well. 
+-- use of CASE WHEN .... END AS new_status to make the conditional new column
+WITH cte AS (
+SELECT 
+  COALESCE(a.user_id, d.user_id) AS all_user_ids,
+  a.status AS past_status, 
+  d.user_id AS user_ids_paid_today 
+FROM advertiser a
+FULL JOIN daily_pay d
+  ON a.user_id = d.user_id
+)
+
+SELECT 
+  all_user_ids, 
+  CASE
+    WHEN user_ids_paid_today IS NULL THEN 'CHURN'
+    WHEN user_ids_paid_today IS NOT NULL THEN 
+      CASE
+        WHEN past_status = 'CHURN' THEN 'RESURRECT'
+        WHEN past_status IS NULL THEN 'NEW'
+        ELSE 'EXISTING'
+      END
+    END AS new_status
+FROM cte 
+ORDER BY all_user_ids
+;

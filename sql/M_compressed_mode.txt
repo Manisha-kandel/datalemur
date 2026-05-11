@@ -1,0 +1,8 @@
+-- M_compressed_mode, 5 minutes
+
+SELECT item_count 
+FROM items_per_order T1
+CROSS JOIN (SELECT MAX(order_occurrences) AS highest_freq FROM items_per_order) T2
+WHERE order_occurrences = highest_freq
+ORDER BY item_count
+;

@@ -1,0 +1,21 @@
+-- M_best_selling_product, 15 minutes
+WITH cte AS (
+SELECT 
+  ps.*, 
+  p.product_name, 
+  p.category_name,
+  ROW_NUMBER() OVER (
+  PARTITION BY p.category_name
+  ORDER BY 
+    sales_quantity DESC,
+    rating DESC
+  ) AS row_num
+FROM product_sales ps
+LEFT JOIN products p 
+ ON p.product_id = ps.product_id
+ )
+ 
+ SELECT category_name, product_name
+ FROM cte 
+ WHERE row_num = 1
+;

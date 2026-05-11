@@ -1,0 +1,13 @@
+-- H_median_google_search_frequency, 10 minutes
+-- use of GENERATE_SERIES(1, num_users, 1) & PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY searches) is the key takeaway. 
+WITH cte AS (
+SELECT 
+  *, 
+  GENERATE_SERIES(1, num_users, 1) AS cnt_expanded 
+FROM search_frequency
+ORDER BY searches
+)
+
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY searches ASC) AS median
+FROM cte 
+;

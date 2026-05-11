@@ -1,0 +1,25 @@
+-- H_consecutive_filing_years, 15 mins
+-- use of LIKE 'turbotax%' 
+-- use of LAG and LEAD (instead of LAG(,1) and LAG(,2))
+WITH cte AS (
+SELECT *, 
+    EXTRACT(YEAR FROM filing_date) AS curr_year,
+    
+    LAG(EXTRACT(YEAR FROM filing_date)) OVER (
+      PARTITION BY user_id 
+      ORDER BY (EXTRACT(YEAR FROM filing_date))
+    ) AS prev_year, 
+    
+    LEAD(EXTRACT(YEAR FROM filing_date)) OVER(
+      PARTITION BY user_id 
+      ORDER BY (EXTRACT(YEAR FROM filing_date))
+    ) AS next_year
+FROM filed_taxes
+WHERE LOWER(product) LIKE 'turbotax%'
+)
+
+SELECT DISTINCT(user_id)
+FROM cte 
+WHERE next_year - prev_year = 2
+ORDER BY user_id
+;
