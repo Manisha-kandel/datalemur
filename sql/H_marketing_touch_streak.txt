@@ -1,0 +1,40 @@
+--H_marketing_touch_streak
+
+WITH weekly_touches AS (
+  -- 1. Get unique touch weeks per contact (avoids duplicate counts)
+  SELECT DISTINCT
+    contact_id,
+    DATE_TRUNC('week', event_date) AS touch_week
+  FROM marketing_touches
+),
+
+streaks AS (
+  -- 2. Group continuous weeks by subtracting a sequential row offset
+  SELECT 
+    contact_id,
+    touch_week,
+    touch_week - (ROW_NUMBER() OVER (PARTITION BY contact_id ORDER BY touch_week) * INTERVAL '7 days') AS streak_id
+  FROM weekly_touches
+),
+
+qualifying_contacts AS (
+  -- 3. Filter for streaks lasting 3 or more weeks
+  SELECT contact_id
+  FROM streaks
+  GROUP BY contact_id, streak_id
+  HAVING COUNT(*) >= 3
+),
+
+trial_requests AS (
+  -- 4. Isolate contacts with at least one trial request
+  SELECT DISTINCT contact_id
+  FROM marketing_touches
+  WHERE event_type = 'trial_request'
+)
+
+-- 5. Join to retrieve and clean-sort final email list
+SELECT c.email
+FROM crm_contacts c
+JOIN qualifying_contacts qc ON c.contact_id = qc.contact_id
+JOIN trial_requests tr ON c.contact_id = tr.contact_id
+ORDER BY c.email;

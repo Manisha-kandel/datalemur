@@ -1,0 +1,41 @@
+-- H_Maximize_Prime_Item_Inventory
+-- Step 1: Summarize the total square footage and item count for each item type
+WITH summary_cte AS (
+  SELECT 
+    item_type, 
+    SUM(square_footage) AS total_sf, 
+    COUNT(item_id) AS num_of_items
+  FROM inventory
+  GROUP BY item_type
+),
+
+-- Step 2: Calculate maximum storage allocation specifically for Prime items
+prime_calc AS (
+  SELECT 
+    total_sf AS prime_sf,
+    -- Find how many full 'batches' of all prime items can fit in the 500k sqft warehouse
+    FLOOR(500000 / total_sf) AS prime_batches,
+    -- Multiply total batches by the distinct item count to get max prime items
+    FLOOR(500000 / total_sf) * num_of_items AS prime_item_count
+  FROM summary_cte
+  WHERE item_type = 'prime_eligible'
+)
+
+-- Step 3: Combine the final outputs into a single results table
+
+-- 3a. Output total count for Prime Eligible items
+SELECT 
+  'prime_eligible' AS item_type,
+  prime_item_count AS item_count
+FROM prime_calc
+
+UNION ALL
+
+-- 3b. Output total count for Non-Prime items using the leftover warehouse space
+SELECT 
+  'not_prime' AS item_type,
+  -- Formula: (Total Space - Space Used by Prime) / SF per Non-Prime Item * Number of Non-Prime Items
+  FLOOR((500000 - (p.prime_batches * p.prime_sf)) / s.total_sf) * s.num_of_items AS item_count
+FROM summary_cte s
+CROSS JOIN prime_calc p -- Joins the single-row prime calculation to access its variables
+WHERE s.item_type = 'not_prime';
