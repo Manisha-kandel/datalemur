@@ -1,0 +1,15 @@
+-- H_Patient_Support_Analysis_Part3, 15 mintues
+-- show policy holder ids with more than one calls in 7-day interval. 
+WITH cte AS (
+SELECT policy_holder_id, call_date, LAG(call_date, 1) OVER(PARTITION BY policy_holder_id ORDER BY call_date) AS prev_call_date
+FROM callers
+), cte2 AS (
+
+SELECT policy_holder_id, ROUND((EXTRACT(EPOCH FROM call_date) - EXTRACT(EPOCH FROM prev_call_date))*1.0/(60*60*24), 2) AS day_diff
+FROM cte
+)
+
+SELECT COUNT(DISTINCT(policy_holder_id)) AS policy_holder_count
+FROM cte2 
+WHERE day_diff <= 7
+;

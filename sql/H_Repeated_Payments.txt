@@ -1,0 +1,19 @@
+-- H_Repeated_Payments
+-- repeated = same merchant, same credit card, same amount, within 10 minutes of each other
+-- use LEAD() for nxt transaction
+
+WITH cte AS (
+SELECT 
+  *, 
+  LEAD(transaction_timestamp) OVER (PARTITION BY merchant_id, credit_card_id, amount ORDER BY transaction_timestamp) AS nxt_transaction_timestamp  
+FROM transactions
+), cte2 AS (
+
+SELECT *, ROUND((EXTRACT(EPOCH FROM nxt_transaction_timestamp)- EXTRACT(EPOCH FROM transaction_timestamp)) / 60.0, 2) AS min_diff
+FROM cte 
+)
+
+SELECT COUNT(*) AS payment_count 
+FROM cte2
+WHERE min_diff <= 10.00
+;

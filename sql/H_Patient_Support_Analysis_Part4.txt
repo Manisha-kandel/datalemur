@@ -1,0 +1,29 @@
+-- H_Patient_Support_Analysis_Part4
+-- long calls: call_duration > 5 minutes
+-- find M-O-M growth rate for long-calls
+WITH long_calls AS (
+SELECT *,
+  EXTRACT(YEAR FROM call_date) as yr,
+  EXTRACT(MONTH FROM call_date) as mth
+FROM callers
+WHERE call_duration_secs > (5*60)
+-- ORDER BY yr, mth
+)
+, monthly_long_calls AS (
+
+SELECT 
+  yr, 
+  mth, 
+  COUNT(*) AS cnt
+FROM long_calls 
+GROUP BY yr, mth
+)
+, cnt_compare AS (
+
+SELECT yr, mth, cnt, LAG(cnt) OVER(ORDER BY yr, mth) AS prev_mth_cnt
+FROM monthly_long_calls
+)
+
+SELECT yr, mth, ROUND((cnt - prev_mth_cnt)*100.0 / prev_mth_cnt, 1) AS long_calls_growth_pct
+FROM cnt_compare
+;
